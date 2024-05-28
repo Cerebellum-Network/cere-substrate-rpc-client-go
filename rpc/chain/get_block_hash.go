@@ -17,6 +17,9 @@
 package chain
 
 import (
+	"context"
+
+	"github.com/centrifuge/go-substrate-rpc-client/v4/config"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 )
 
@@ -33,11 +36,13 @@ func (c *chain) GetBlockHashLatest() (types.Hash, error) {
 func (c *chain) getBlockHash(blockNumber *uint64) (types.Hash, error) {
 	var res string
 	var err error
+	ctx, cancel := context.WithTimeout(context.Background(), config.Default().DialTimeout)
+	defer cancel()
 
 	if blockNumber == nil {
-		err = c.client.Call(&res, "chain_getBlockHash")
+		err = c.client.CallContext(ctx, &res, "chain_getBlockHash")
 	} else {
-		err = c.client.Call(&res, "chain_getBlockHash", *blockNumber)
+		err = c.client.CallContext(ctx, &res, "chain_getBlockHash", *blockNumber)
 	}
 
 	if err != nil {
