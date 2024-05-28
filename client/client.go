@@ -81,7 +81,8 @@ func Connect(url string) (Client, error) {
 }
 
 func CallWithBlockHash(c Client, target interface{}, method string, blockHash *types.Hash, args ...interface{}) error {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), config.Default().DialTimeout)
+	defer cancel()
 
 	return CallWithBlockHashContext(ctx, c, target, method, blockHash, args...)
 }
