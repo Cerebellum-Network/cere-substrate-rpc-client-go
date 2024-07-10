@@ -2,7 +2,9 @@ package parser
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"io"
 
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/scale"
@@ -43,6 +45,9 @@ func NewEventParser() EventParser {
 		eventsCount, err := decoder.DecodeUintCompact()
 
 		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return nil, nil
+			}
 			return nil, ErrEventsCountDecoding.Wrap(err)
 		}
 
